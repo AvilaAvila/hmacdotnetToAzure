@@ -1,10 +1,12 @@
 using System;
+using System.IO;
 using System.Text;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace Company.Function
 {
@@ -18,13 +20,29 @@ namespace Company.Function
         }
 
         [Function("hmacshenlldot")]
-        public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
+        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
 
-            // Example key and message
-            string key = "your-secret-key";
-            string message = "your-message";
+            // Read key and message from the request
+            string key = req.Query["key"];
+            string message = req.Query["message"];
+
+            if (string.IsNullOrEmpty(key))
+            {
+                return new BadRequestObjectResult(new { error = "Key cannot be empty." });
+            }
+
+            if (req.Method == HttpMethods.Post && string.IsNullOrEmpty(key) || string.IsNullOrEmpty(message))
+            {
+                using (var reader = new StreamReader(req.Body))
+                {
+                    var body = await reader.ReadToEndAsync();
+                    var data = JsonSerializer.Deserialize<Dictionary<string, string>>(body);
+                    key = data.ContainsKey("key") ? data["key"] : key;
+                    message = data.ContainsKey("message") ? data["message"] : message;
+                }
+            }
 
             // Generate HMAC token
             string hmacToken = CreateHmacToken(key, message);
