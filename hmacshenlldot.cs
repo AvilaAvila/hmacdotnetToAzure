@@ -49,7 +49,7 @@ namespace Company.Function
             string hmacToken = CreateHmacToken(key, message);
 
             // Return the HMAC token as part of the response
-            return new OkObjectResult(new { message = "Welcome to Azure Functions, this is done by Shenll teams!", hmacToken });
+            return new OkObjectResult(new { message = "Welcome to Azure Functions", hmacToken });
         }
 
         private string CreateHmacToken(string key, string message)
