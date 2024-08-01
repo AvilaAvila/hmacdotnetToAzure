@@ -12,16 +12,16 @@ using Microsoft.Extensions.Logging;
 
 namespace Company.Function
 {
-    public class hmacshenlldot
+    public class hmactokengen
     {
-        private readonly ILogger<hmacshenlldot> _logger;
+        private readonly ILogger<hmactokengen> _logger;
 
-        public hmacshenlldot(ILogger<hmacshenlldot> logger)
+        public hmactokengen(ILogger<hmactokengen> logger)
         {
             _logger = logger;
         }
 
-        [Function("hmacshenlldot")]
+        [Function("hmactokengen")]
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
